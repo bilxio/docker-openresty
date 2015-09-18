@@ -53,7 +53,7 @@ RUN cd /root \
  && ln -sf $OPENRESTY_PREFIX/luajit/bin/luajit-* /usr/local/bin/lua \
  && rm -rf /root/ngx_openresty*
 
-WORKDIR $NGINX_PREFIX/
+WORKDIR "$NGINX_PREFIX"
 
 ONBUILD RUN rm -rf conf/* html/*
 ONBUILD COPY nginx $NGINX_PREFIX/
