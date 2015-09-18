@@ -1,5 +1,7 @@
 FROM debian:wheezy
 
+MAINTAINER Xiong Zhengdong <haibxz@gmail.com>
+
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
     curl perl make build-essential procps \
