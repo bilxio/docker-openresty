@@ -5,4 +5,4 @@ I build this imaged based on ficusio/openresty:1.7.10.2-debian, and also followe
 
 ## License
 
-[MIT License](http://oswaldoacauan.mit-license.org/) © Oswaldo Acauan
+[MIT License](http://oswaldoacauan.mit-license.org/) © Bill Xiong
