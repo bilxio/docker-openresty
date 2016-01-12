@@ -3,15 +3,11 @@ MAINTAINER "Xiong Zhengdong" <haibxz@gmail.com>
 
 ADD bundles/* /tmp/
 
-ADD set_root_pw.sh /set_root_pw.sh
-ADD run.sh /run.sh
-RUN chmod +x /run.sh
-
 RUN rpm -ivh /tmp/epel-release-7-5.noarch.rpm
 RUN yum update -y && \
   yum install -y readline-devel pcre-devel openssl-devel gcc \
   gcc+ gcc-c++ autoconf automake libtool \
-  bzip2 unzip git vim tmux
+  bzip2 unzip git vim tmux pwgen openssh-server
 
 ENV AUTHORIZED_KEYS **None**
 ENV OPENRESTY_VERSION 1.7.10.1
@@ -20,8 +16,6 @@ ENV NGINX_PREFIX $OPENRESTY_PREFIX/nginx
 ENV VAR_PREFIX /var/nginx
 ENV LUAJIT_DIR $OPENRESTY_PREFIX/luajit
 ENV LUAJIT_INCLUDE $LUAJIT_DIR/include/luajit-2.1
-
-RUN yum install -y pwgen openssh-server
 
 # Update ssh keys
 RUN rm -f /etc/ssh/ssh_host_ecdsa_key /etc/ssh/ssh_host_rsa_key /etc/ssh/ssh_host_ed25519_key && \
@@ -69,6 +63,9 @@ RUN echo "Install luarocks ..." \
   && ln -sf /usr/local/luarocks/bin/luarocks /usr/local/bin/
 
 RUN rm -rf /tmp/*
+ADD set_root_pw.sh /set_root_pw.sh
+ADD run.sh /run.sh
+RUN chmod +x /run.sh
 
 WORKDIR ${NGINX_PREFIX}
 
