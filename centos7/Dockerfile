@@ -1,19 +1,59 @@
 FROM daocloud.io/centos:7
 MAINTAINER "Xiong Zhengdong" <haibxz@gmail.com>
 
-ADD http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm /tmp/
 # ADD http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm /tmp/
-ADD https://openresty.org/download/ngx_openresty-1.7.10.1.tar.gz /tmp/
 # ADD https://openresty.org/download/ngx_openresty-1.7.10.1.tar.gz /tmp/
+ADD bundles/* /tmp/
 
 RUN rpm -ivh /tmp/epel-release-7-5.noarch.rpm
-RUN yum update -y
-RUN yum install -y readline-devel pcre-devel openssl-devel gcc nginx
+RUN yum update -y && \
+  yum install -y readline-devel pcre-devel openssl-devel gcc \
+  gcc+ gcc-c++ autoconf automake libtool \
+  bzip2 unzip vim tmux nginx
 
 ENV OPENRESTY_VERSION 1.9.3.1
 ENV OPENRESTY_PREFIX /opt/openresty
-ENV NGINX_PREFIX /opt/openresty/nginx
+ENV NGINX_PREFIX ${OPENRESTY_PREFIX}/nginx
 ENV VAR_PREFIX /var/nginx
+ENV LUA_DIR ${OPENRESTY_PREFIX}/lua
+
+RUN echo "Install openresty ..." \
+  && cd /tmp/ngx_openresty-1.7.10.1 \
+  && ./configure --prefix=/opt/openresty \
+    --with-pcre-jit \
+    --with-ipv6 \
+    --with-lua51 \
+    --with-luajit \
+    --without-http_redis2_module \
+    --with-http_iconv_module \
+  && make -j2 && make install
+
+# Protoc and python runtime
+# RUN curl http://106.184.4.145/files/gtest-1.5.0.tar.bz2 | tar jx
+RUN echo "Install protobuf compiler ..." \
+  && cd /tmp/protobuf-2.5.0 \
+  && echo "106.184.4.145 googletest.googlecode.com" >> /etc/hosts \
+  && ./autogen.sh && ./configure && make && make install \
+  && echo "Install protobuf python runtime ..." \
+  && cd ./python \
+  && python setup.py build \
+  && python setup.py install
+
+# Lua output plugin for protoc
+# RUN git clone https://github.com/sean-lin/protoc-gen-lua.git
+RUN echo "Install protoc-gen-lua ..." \
+  && cd /tmp/protoc-gen-lua/protobuf \
+  && rm -f pb.so \
+  && PKG_CONFIG_PATH=${OPENRESTY_PREFIX}/luajit/lib/pkgconfig make \
+  && cp pb.so ${OPENRESTY_PREFIX}/lualib/ \
+  && cd ../plugin && ln -sf `pwd`/protoc-gen-lua /usr/local/bin/
+
+RUN echo "Install luarocks ..." \
+  && cd /tmp/luarocks-2.1.0 \
+  && ./configure --prefix=/usr/local/luarocks \
+    --with-lua=${OPENRESTY_PREFIX}/lua \
+  && make build && make install \
+  && ln -sf /usr/local/luarocks/bin/luarocks /usr/local/bin/
 
 WORKDIR ${NGINX_PREFIX}
 
