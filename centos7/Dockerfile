@@ -1,10 +1,9 @@
 FROM daocloud.io/centos:7
 MAINTAINER "Xiong Zhengdong" <haibxz@gmail.com>
 
-ADD http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm /tmp/
 # ADD http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm /tmp/
-ADD https://openresty.org/download/ngx_openresty-1.7.10.1.tar.gz /tmp/
 # ADD https://openresty.org/download/ngx_openresty-1.7.10.1.tar.gz /tmp/
+ADD bundles/* /tmp/
 
 RUN rpm -ivh /tmp/epel-release-7-5.noarch.rpm
 RUN yum update -y
