@@ -1,8 +1,8 @@
 FROM daocloud.io/centos:7
 MAINTAINER "Xiong Zhengdong" <haibxz@gmail.com>
 
-RUN mkdir /data
-ADD epel-release-7-5.noarch.rpm /tmp/
+ADD http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm /tmp/
+
 RUN rpm -ivh /tmp/epel-release-7-5.noarch.rpm
 RUN yum update -y
 RUN yum install -y readline-devel pcre-devel openssl-devel gcc
@@ -49,9 +49,7 @@ RUN cd /root \
  && ln -sf $OPENRESTY_PREFIX/luajit/bin/luajit-* /usr/local/bin/lua \
  && rm -rf /root/ngx_openresty*
 
-WORKDIR "$NGINX_PREFIX"
+WORKDIR ${NGINX_PREFIX}
 
 EXPOSE 22 80 8080
 CMD ["nginx", "-g", "daemon off; error_log /dev/stderr info;"]
-
-
