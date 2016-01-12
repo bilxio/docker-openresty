@@ -7,7 +7,7 @@ RUN rpm -ivh /tmp/epel-release-7-5.noarch.rpm
 RUN yum update -y && \
   yum install -y readline-devel pcre-devel openssl-devel gcc \
   gcc+ gcc-c++ autoconf automake libtool \
-  bzip2 unzip git pwgen openssh-server
+  bzip2 unzip git
 
 ENV AUTHORIZED_KEYS **None**
 ENV OPENRESTY_VERSION 1.7.10.1
@@ -16,13 +16,6 @@ ENV NGINX_PREFIX $OPENRESTY_PREFIX/nginx
 ENV VAR_PREFIX /var/nginx
 ENV LUAJIT_DIR $OPENRESTY_PREFIX/luajit
 ENV LUAJIT_INCLUDE $LUAJIT_DIR/include/luajit-2.1
-
-# Update ssh keys
-RUN rm -f /etc/ssh/ssh_host_ecdsa_key /etc/ssh/ssh_host_rsa_key /etc/ssh/ssh_host_ed25519_key && \
-    ssh-keygen -q -N "" -t dsa -f /etc/ssh/ssh_host_ecdsa_key && \
-    ssh-keygen -q -N "" -t rsa -f /etc/ssh/ssh_host_rsa_key && \
-    ssh-keygen -q -N "" -t ed25519 -f /etc/ssh/ssh_host_ed25519_key && \
-    sed -i "s/#UsePrivilegeSeparation.*/UsePrivilegeSeparation no/g" /etc/ssh/sshd_config
 
 RUN echo "Install openresty ..." \
   && cd /tmp/ngx_openresty-$OPENRESTY_VERSION \
@@ -61,6 +54,15 @@ RUN echo "Install luarocks ..." \
     --with-lua-include=$LUAJIT_INCLUDE \
   && make build && make install \
   && ln -sf /usr/local/luarocks/bin/luarocks /usr/local/bin/
+
+RUN yum install -y pwgen openssh-server
+
+# Update ssh keys
+RUN rm -f /etc/ssh/ssh_host_ecdsa_key /etc/ssh/ssh_host_rsa_key /etc/ssh/ssh_host_ed25519_key && \
+    ssh-keygen -q -N "" -t dsa -f /etc/ssh/ssh_host_ecdsa_key && \
+    ssh-keygen -q -N "" -t rsa -f /etc/ssh/ssh_host_rsa_key && \
+    ssh-keygen -q -N "" -t ed25519 -f /etc/ssh/ssh_host_ed25519_key && \
+    sed -i "s/#UsePrivilegeSeparation.*/UsePrivilegeSeparation no/g" /etc/ssh/sshd_config
 
 RUN rm -rf /tmp/*
 ADD set_root_pw.sh /set_root_pw.sh
