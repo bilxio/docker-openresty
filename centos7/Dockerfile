@@ -9,7 +9,7 @@ RUN rpm -ivh /tmp/epel-release-7-5.noarch.rpm
 RUN yum update -y && \
   yum install -y readline-devel pcre-devel openssl-devel gcc \
   gcc+ gcc-c++ autoconf automake libtool \
-  bzip2 unzip vim tmux nginx
+  bzip2 unzip git vim tmux nginx
 
 ENV OPENRESTY_VERSION 1.9.3.1
 ENV OPENRESTY_PREFIX /opt/openresty
@@ -29,10 +29,10 @@ RUN echo "Install openresty ..." \
   && make -j2 && make install
 
 # Protoc and python runtime
-# RUN curl http://106.184.4.145/files/gtest-1.5.0.tar.bz2 | tar jx
+# To avoid GFW, we're now get gtest from github instead of curl from google.
 RUN echo "Install protobuf compiler ..." \
   && cd /tmp/protobuf-2.5.0 \
-  && echo "106.184.4.145 googletest.googlecode.com" >> /etc/hosts \
+  && git clone https://github.com/bilxio/gtest.git \
   && ./autogen.sh && ./configure && make && make install \
   && echo "Install protobuf python runtime ..." \
   && cd ./python \
