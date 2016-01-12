@@ -11,14 +11,15 @@ RUN yum update -y && \
   gcc+ gcc-c++ autoconf automake libtool \
   bzip2 unzip git vim tmux nginx
 
-ENV OPENRESTY_VERSION 1.9.3.1
+ENV OPENRESTY_VERSION 1.7.10.1
 ENV OPENRESTY_PREFIX /opt/openresty
-ENV NGINX_PREFIX ${OPENRESTY_PREFIX}/nginx
+ENV NGINX_PREFIX $OPENRESTY_PREFIX/nginx
 ENV VAR_PREFIX /var/nginx
-ENV LUA_DIR ${OPENRESTY_PREFIX}/lua
+ENV LUAJIT_DIR $OPENRESTY_PREFIX/luajit
+ENV LUAJIT_INCLUDE $LUAJIT_DIR/include/luajit-2.1
 
 RUN echo "Install openresty ..." \
-  && cd /tmp/ngx_openresty-1.7.10.1 \
+  && cd /tmp/ngx_openresty-$OPENRESTY_VERSION \
   && ./configure --prefix=/opt/openresty \
     --with-pcre-jit \
     --with-ipv6 \
@@ -51,7 +52,7 @@ RUN echo "Install protoc-gen-lua ..." \
 RUN echo "Install luarocks ..." \
   && cd /tmp/luarocks-2.1.0 \
   && ./configure --prefix=/usr/local/luarocks \
-    --with-lua=${OPENRESTY_PREFIX}/lua \
+    --with-lua-include=$LUAJIT_INCLUDE \
   && make build && make install \
   && ln -sf /usr/local/luarocks/bin/luarocks /usr/local/bin/
 
