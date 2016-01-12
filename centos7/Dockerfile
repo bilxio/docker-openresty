@@ -1,22 +1,34 @@
 FROM daocloud.io/centos:7
 MAINTAINER "Xiong Zhengdong" <haibxz@gmail.com>
 
-# ADD http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm /tmp/
-# ADD https://openresty.org/download/ngx_openresty-1.7.10.1.tar.gz /tmp/
 ADD bundles/* /tmp/
+
+ADD set_root_pw.sh /set_root_pw.sh
+ADD run.sh /run.sh
+RUN chmod +x /run.sh
 
 RUN rpm -ivh /tmp/epel-release-7-5.noarch.rpm
 RUN yum update -y && \
   yum install -y readline-devel pcre-devel openssl-devel gcc \
   gcc+ gcc-c++ autoconf automake libtool \
-  bzip2 unzip git vim tmux nginx
+  bzip2 unzip git vim tmux
 
+ENV AUTHORIZED_KEYS **None**
 ENV OPENRESTY_VERSION 1.7.10.1
 ENV OPENRESTY_PREFIX /opt/openresty
 ENV NGINX_PREFIX $OPENRESTY_PREFIX/nginx
 ENV VAR_PREFIX /var/nginx
 ENV LUAJIT_DIR $OPENRESTY_PREFIX/luajit
 ENV LUAJIT_INCLUDE $LUAJIT_DIR/include/luajit-2.1
+
+RUN yum install -y pwgen openssh-server
+
+# Update ssh keys
+RUN rm -f /etc/ssh/ssh_host_ecdsa_key /etc/ssh/ssh_host_rsa_key /etc/ssh/ssh_host_ed25519_key && \
+    ssh-keygen -q -N "" -t dsa -f /etc/ssh/ssh_host_ecdsa_key && \
+    ssh-keygen -q -N "" -t rsa -f /etc/ssh/ssh_host_rsa_key && \
+    ssh-keygen -q -N "" -t ed25519 -f /etc/ssh/ssh_host_ed25519_key && \
+    sed -i "s/#UsePrivilegeSeparation.*/UsePrivilegeSeparation no/g" /etc/ssh/sshd_config
 
 RUN echo "Install openresty ..." \
   && cd /tmp/ngx_openresty-$OPENRESTY_VERSION \
@@ -56,7 +68,9 @@ RUN echo "Install luarocks ..." \
   && make build && make install \
   && ln -sf /usr/local/luarocks/bin/luarocks /usr/local/bin/
 
+RUN rm -rf /tmp/*
+
 WORKDIR ${NGINX_PREFIX}
 
 EXPOSE 22 80 8080
-CMD ["nginx", "-g", "daemon off; error_log /dev/stderr info;"]
+CMD ["/run.sh"]
