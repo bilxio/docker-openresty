@@ -7,7 +7,7 @@ RUN rpm -ivh /tmp/epel-release-7-5.noarch.rpm
 RUN yum update -y && \
   yum install -y readline-devel pcre-devel openssl-devel gcc \
   gcc+ gcc-c++ autoconf automake libtool \
-  bzip2 unzip git
+  bzip2 unzip git nginx
 
 ENV AUTHORIZED_KEYS **None**
 ENV OPENRESTY_VERSION 1.7.10.1
@@ -22,7 +22,6 @@ RUN echo "Install openresty ..." \
   && ./configure --prefix=/opt/openresty \
     --with-pcre-jit \
     --with-ipv6 \
-    --with-lua51 \
     --with-luajit \
     --without-http_redis2_module \
     --with-http_iconv_module \
