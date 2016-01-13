@@ -6,8 +6,8 @@ ADD bundles/* /tmp/
 RUN rpm -ivh /tmp/epel-release-7-5.noarch.rpm
 RUN yum update -y && \
   yum install -y readline-devel pcre-devel openssl-devel gcc \
-  gcc+ gcc-c++ autoconf automake libtool \
-  bzip2 unzip git nginx
+  gcc+ gcc-c++ autoconf automake libtool make \
+  bzip2 unzip git
 
 ENV AUTHORIZED_KEYS **None**
 ENV OPENRESTY_VERSION 1.7.10.1
