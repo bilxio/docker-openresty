@@ -1,4 +1,5 @@
-FROM daocloud.io/centos:7
+#FROM daocloud.io/centos:7
+FROM centos:7
 MAINTAINER "Xiong Zhengdong" <haibxz@gmail.com>
 
 ADD bundles/* /tmp/
