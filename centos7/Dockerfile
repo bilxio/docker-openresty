@@ -64,7 +64,9 @@ RUN rm -f /etc/ssh/ssh_host_ecdsa_key /etc/ssh/ssh_host_rsa_key /etc/ssh/ssh_hos
     sed -i "s/#UsePrivilegeSeparation.*/UsePrivilegeSeparation no/g" /etc/ssh/sshd_config
 
 RUN rm -rf /tmp/*
+
 ADD set_root_pw.sh /set_root_pw.sh
+RUN chmod +x /set_root_pw.sh
 ADD run.sh /run.sh
 RUN chmod +x /run.sh
 
